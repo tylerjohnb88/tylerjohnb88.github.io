@@ -4,15 +4,120 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
 
-    <title>Example Student's HCDE 439 Physical Computing Page!</title>
+    <title>A1: Blinky Lights</title>
 
     <link href="style.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
-    <h1>Example Student's Assignment 1!</h1>
+    <h1>A1: Blinky Lights</h1>
     <div class="header">
-      <img src="red-panda.jpg" />
-      <p>Here is all the documentation for assignment 1!</p>
+      <img src="Images/A1 Result.GIF" />
+      <p>Here is all the documentation for A1: Blink! 
+        This was the result.
+      </p>
     </div>
   </body>
 </html>
+
+<div class="grid">
+  <div class="element">
+    <h2>Circuit Design</h2>
+    <img src="Images/A1 Circuit Design.jpg" />
+    <p>A 220Ω resistor was used for the red LED and 100Ω
+      resistors were used for the blue and white LEDs in 
+      order to keep the amperage below 20mA for each 
+      cicuit, the recommended max for this Arduino.
+    </p>
+  </div>
+
+  <div class="element">
+      <h2>Schematic</h2>
+      <img src="Images/A1 Schematic.png" />
+    </a>
+  </div>
+</div>
+
+<div> 
+  <h2>Code Snippet</h2>
+  <div class="container">
+      <div class="box">
+        <pre class="language-arduino" data-src="prism.js" data-src-status="loaded">
+          <code class="language-arduino">
+          void setup() {
+            // initialize digital pins as output.
+            pinMode(12, OUTPUT);
+            pinMode(10, OUTPUT);
+            pinMode(6, OUTPUT);
+          }
+          
+          // the loop function runs over and over again forever
+          void loop() {
+            digitalWrite(12, HIGH);  // turn the LED on (HIGH is the voltage level)
+            delay(1000);             // wait for a second
+            digitalWrite(12, LOW);   // turn the LED off by making the voltage LOW
+            delay(100);              // wait for 1/10 second
+          
+            digitalWrite(10, HIGH);  // turn the LED on (HIGH is the voltage level)
+            delay(1000);             // wait for a second
+            digitalWrite(10, LOW);   // turn the LED off by making the voltage LOW
+            delay(100);              // wait for 1/10 second
+          
+            digitalWrite(6, HIGH);   // turn the LED on (HIGH is the voltage level)
+            delay(1000);             // wait for a second
+            digitalWrite(6, LOW);    // turn the LED off by making the voltage LOW
+            delay(100);              // wait for 1/10 second
+          }
+          </code>
+        </pre>
+      </div>
+  </div>
+</div>
+
+<div>
+  <h2>Homework Questions</h2>
+  <div class="container">
+      <div class="box">
+        <p>
+          <b>
+            1: Draw a graph where the X axis is time and 
+            the Y axis is voltage across the LEDs. Draw a 
+            line for each of your 3 LEDs.
+          </b>
+        </p>
+        <img src="Images/A1 Q1.png"/>
+        <p>
+          <b>
+            2: How many LEDs could you blink at once with 
+            your Arduino? How much current would that draw?
+          </b>
+        </p>
+        <p>
+          I think the 5v limitations of the Arduino is the 
+          limiting factor. Therefore, I could chain two red,
+          green, or yellow LEDs with a 220Ω resistor for 
+          a current draw of 0.006A
+          OR a single blue, pink, or white LED with a 100Ω 
+          resistor for a current draw of 0.017A.
+        </p>
+        <p> 
+          <b>
+            <s>
+              3: How many LEDs could you blink with your 
+              Arduino if only one were to be on at once?
+            </s>
+          </b>
+        </p>
+        <p>
+          <b>
+            4: How fast do you need to blink your LEDs until you no longer can tell that they are blinking?
+          </b>
+        </p>
+        <p>
+          Even blinking it for 1 milisecond with a second between
+          blinks, the blink was visible. If the blink and pause 
+          between blinks is 1 milisecond, then the LED simply 
+          appears to remain on.
+        </p>
+      </div>
+    </div>
+</div>

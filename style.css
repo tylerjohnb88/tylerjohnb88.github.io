@@ -60,6 +60,11 @@ h2 {
   text-decoration: none;
 }
 
+.assignment b {
+  color: #024D1F;
+  text-decoration: none;
+}
+
 .assignment a:hover {
   color: #f06;
 }
