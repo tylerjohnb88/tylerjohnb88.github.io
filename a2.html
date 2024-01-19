@@ -3,16 +3,148 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
+    <link rel="stylesheet" href="prism.css">
+    <script defer src="prism.js"></script>
 
-    <title>Example Student's HCDE 439 Physical Computing Page!</title>
+    <title>A2: Fading Lights</title>
 
     <link href="style.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
-    <h1>Example Student's Assignment 2!</h1>
+    <h1>A2: Fading Lights</h1>
     <div class="header">
-      <img src="red-panda.jpg" />
-      <p>Here is all the documentation for assignment 2!</p>
+      <img src="Images/A2 Result.gif" />
+      <p>Here is all the documentation for A2: Fade!
+        This was the result.
+        <br>
+        <br>
+        Assignment 2 was about learning to use inputs in 
+        the form of buttons and how to better work with LED 
+        capabilities to get varied brightnesses and collors.
+      </p>
     </div>
   </body>
 </html>
+
+<div class="grid">
+  <div class="element">
+    <h2>Circuit Design</h2>
+    <img src="Images/A2 Circuit.png" />
+  </div>
+
+  <div class="element">
+      <h2>Schematic</h2>
+      <img src="Images/A2 Schematic.png" />
+      <p>
+        A 220Ω resistor was used for the red LED, a 
+        100Ω resistor was used for the blue LED, and a 10Ω
+        resistor was used for the button in order 
+        to keep the amperage below 20mA for each cicuit, 
+        the recommended max for this Arduino.
+      </p>
+  </div>
+</div>
+
+<div> 
+  <h2>Code Snippet</h2>
+  <div class="container">
+      <div class="box">
+        <pre> 
+          <code class="language-arduino">
+          // This program is intended to turn on/off a fading light with a 
+          // single press of the button.
+            
+          // Assigning names to the pin numbers used:
+          const int buttonPin = 2;  // the number of the button pin
+          const int red = 11;       // the number of the red LED pin
+          const int green = 10;     // the number of the green LED pin
+          const int blue = 9;       // the number of the blue LED pin
+            
+          // Other variables:
+          int buttonState = 0;  // variable for reading the button status
+          int OnOff = 0;        // variable for tracking desired system state
+            
+          void setup() {
+            // Initialize the pins to be used:
+            pinMode(red, OUTPUT);       // initialize red the LED pin as an output
+            pinMode(green, OUTPUT);     // initialize the green LED pin as an output
+            pinMode(blue, OUTPUT);      // initialize the blue LED pin as an output
+            pinMode(buttonPin, INPUT);  // initialize the pushbutton pin as an input
+          }
+            
+            void loop() {
+            // read the state of the pushbutton value:
+            buttonState = digitalRead(buttonPin); // read the button.
+              if (buttonState == 1)               // if button pressed, alternate OnOff state.
+              {                                   
+                if (OnOff == 1)                   
+                  {
+                    OnOff = 0;                    // if OnOff is on, turn off.
+                  }
+                else {OnOff = 1;}                 // if OnOff is off, turn on.
+                while (digitalRead(buttonPin))    // delay if loop to prevent rapid switching
+                {                                   // of OnOff variable.
+                  delay(10);                      // delay 1/100 of a second for as long as
+                }                                   // the button is pressed.
+              }
+            
+              // check if the system is OnOff. If it is on, the LED enters the fade cycle:
+              if (OnOff == 1) {                   // if on
+                digitalWrite(blue, HIGH);            // turn LED on
+                for (int i=0;i<256;i++) {         // increase i (brightness) every cycle
+                  analogWrite(red, i);            // turn the LED on at the current value of i
+                  delay(10);                      // wait for 1/100 second
+                  if (digitalRead(buttonPin)){    
+                    break;                        // break this cycle if the button is pressed
+                  }
+                }
+            
+                for (int i=255;i>0;i--) {         // decrease i (brightness) every cycle
+                  analogWrite(red, i);            // turn the LED on at the current value of i
+                  delay(10);                      // wait for 1/100 second
+                  if (digitalRead(buttonPin)){
+                    break;                        // break this cycle if the button is pressed
+                  }
+                }
+                analogWrite(red, 0);              // turn LED off
+                analogWrite(blue, 0);             // turn LED off
+                analogWrite(green, 0);            // turn LED off
+              } 
+            }
+          </code>
+        </pre>
+      </div>
+  </div>
+</div>
+
+<div>
+  <h2>Homework Questions</h2>
+  <div class="container">
+      <div class="box">
+        <p>
+          <b>
+            1: Draw a chart where the X axis is time and 
+            the Y axis is voltage. Draw 3 lines representing 
+            the voltage across an LED with analogWrite(led, 64), 
+            analogWrite(led, 128), and analogWrite(led,255).
+          </b>
+        </p>
+        <img src="Images/A2 Q1.png"/>
+        <p>
+          <b>
+            2: Given your schematic, circuit, and firmware, 
+            assuming the only thing that draws current is 
+            your LEDs, how long would your circuit run if 
+            powered by a 1200 mAh battery?
+          </b>
+        </p>
+        <p>
+          Theoretically, 4h 54m, but a better answer would 
+          be somewhere between 3h 45m and 4h 54m.
+        </p>
+        </p>
+        <img src="Images/A2 Q2.png"/>
+        <p>
+      </div>
+    </div>
+</div>

@@ -38,9 +38,20 @@ h2 {
 }
 
 .header {
+  text-align: center;
   display: flex;
   gap: 1em;
   margin-top: 1em;
+}
+
+.right_header {
+  color: #024D1F;
+  float: right;
+}
+
+.left_header {
+  color: #024D1F;
+  float: left;
 }
 
 .header img {
