@@ -3,16 +3,337 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
-
-    <title>Example Student's HCDE 439 Physical Computing Page!</title>
+    <link rel="stylesheet" href="prism.css">
+    <script defer src="prism.js"></script>
+    
+    <title>A3: Input/Output</title>
 
     <link href="style.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
-    <h1>Example Student's Assignment 2!</h1>
+    <h1>A3: Input/Output</h1>
     <div class="header">
-      <img src="red-panda.jpg" />
-      <p>Here is all the documentation for assignment 2!</p>
+      <div class="split">
+        <img src="Images/A3 Result.gif" />
+        <p>Here is all the documentation for A3: Input/Output
+          This was the result.
+          <br>
+          <br>
+          Assignment 3 was about voltage dividers, inputs 
+          and conditional outputs, photoresistors and thermistors,
+          and working with/ converting between various bit capacities.
+          <br>
+          <br>
+          I used a thermistor to measure the temperature. I also 
+          used an ultrasonic sensor to measure the distance of my
+          hand from the board which relied on the temperature 
+          measurement to calculate the speed of sound in that
+          specific temperature. The results are displayed on the LCD.
+        </p>
+      </div>
     </div>
   </body>
 </html>
+
+<div class="grid">
+  <div class="element">
+    <h2>Circuit Design</h2>
+    <img src="Images/A3 Circuit.png" />
+  </div>
+
+  <div class="element">
+    <h2>Schematic</h2>
+    <img src="Images/A3 Schematic.png" />
+  </div>
+</div>
+
+<div> 
+  <h2>Code Snippet</h2>
+  <div class="container">
+      <div class="box">
+        <pre> 
+          <code class="language-arduino">
+            // LCD Screen
+            //  Library originally added 18 Apr 2008
+            //  by David A. Mellis
+            //  library modified 5 Jul 2009
+            //  by Limor Fried (http://www.ladyada.net)
+            //  example added 9 Jul 2009
+            //  by Tom Igoe
+            //  modified 22 Nov 2010
+            //  by Tom Igoe
+            //  modified 7 Nov 2016
+            //  by Arturo Guadalupi
+            //  https://docs.arduino.cc/learn/electronics/lcd-displays
+            
+            // Proximity Sensor
+            //  Modified code from David A. Mellis' "Ping" example
+            //  created 3 Nov 2008
+            //  modified 30 Aug 2011 by Tom Igoe
+            //  modified for the HC-SR04 sensor
+            
+            // This library is for the LCD
+            #include LiquidCrystal.h        // add <> on either side of the library
+            // Documentation: https://www.arduino.cc/reference/en/libraries/liquidcrystal/
+            
+            const int trigPin = 9;          // proximity sensor output pin
+            const int echoPin = 10;         // proximity sensor input pin
+              // establish variables for duration of the ping, and the distance result
+              // in inches and centimeters:
+            long duration, inches, cm, distance;
+            
+            const int rs = 12, en = 11, 
+            d4 = 5, d5 = 4, d6 = 3, d7 = 2;   // LCD pins
+            
+            int thermistorPin = A0;
+            int thermistorValue;              // resistance of thermistor
+            float R1 = 10000, logR2, R2,      // variables for processing the 
+            c1 = 1.009249522e-03,              // thermistor specific coefficients
+            c2 = 2.378405444e-04, 
+            c3 = 2.019202697e-07;
+            double temperature;
+            // double temperatureFarenheit;
+            
+            int loopCount = 0;              // to count the number of loops
+            
+            LiquidCrystal lcd(rs, en, d4, d5, d6, d7); // initializing the LCD Library
+            
+            void setup() {
+              Serial.begin(9600);         // initialize serial communication
+            
+              pinMode(trigPin, OUTPUT);   // set out pin for proximity sensor
+              pinMode(echoPin, INPUT);    // set in pin for proximity sensor
+            
+              lcd.begin(16, 2);           // set the LCD's number of columns and rows
+            }
+            
+            void loop() {
+              thermistorValue = analogRead(thermistorPin);        // read thermistor
+              R2 = R1 * (1023.0 / (float)thermistorValue - 1.0);  // process reading to temp
+              logR2 = log(R2);                                   
+              temperature = (1.0 / (c1 + c2*logR2 + c3*logR2*logR2*logR2));
+              temperature = temperature - 273.15;                 // store temp in celcius
+              // temperatureFarenheit = (T * 9.0)/ 5.0 + 32.0;    // convert to farenheit
+               
+              // Send a burst of sound at 40Hz and listen for the return of the sound
+              digitalWrite(trigPin, LOW);   // pulse cycle off
+              delayMicroseconds(2);         // delay 2 microseconds
+              digitalWrite(trigPin, HIGH);  // pulse cycle on
+              delayMicroseconds(10);        // delay 10 microseconds
+              digitalWrite(trigPin, LOW);   // pulse cycle off
+            
+              // Measure the duration of time it takes for the sound to return
+              duration = pulseIn(echoPin, HIGH);
+              distance = duration*0.34/2;  // duration * speed of sound / there and back
+            
+              // convert the time into a distance
+              // inches = microsecondsToInches(duration);
+              cm = microsecondsToCentimeters(duration);
+              
+              /*
+              // Serial monitor output
+              Serial.print(inches);
+              Serial.print("in, ");
+              Serial.print(cm);
+              Serial.print("cm");
+              Serial.println(); 
+              Serial.print(temperature);
+              Serial.println(" °C");
+              */
+              
+              // LCD output
+              // (note: line 1 is the second row, since counting begins with 0):
+              lcd.clear();                // set the cursor to column 0, line 1
+              lcd.print(cm);              // print distance
+              lcd.print("cm");
+              lcd.setCursor(9, 1);        // move cursor to bottom right
+              lcd.print(temperature);     // print temperature
+              lcd.print(" C");
+            
+              delay(100);       // a delay to control the loop's refresh rate
+            }
+            
+            long microsecondsToInches(long microseconds) {
+              // According to Parallax's datasheet for the PING))), there are 73.746
+              // microseconds per inch (i.e. sound travels at 1130 feet per second).
+              // This gives the distance travelled by the ping, outbound and return,
+              // so we divide by 2 to get the distance of the obstacle.
+              // See: https://www.parallax.com/package/ping-ultrasonic-distance-sensor-downloads/
+              return microseconds / 74 / 2;
+            }
+            
+            long microsecondsToCentimeters(long microseconds) {
+              // The speed of sound is 340 m/s or 29 microseconds per centimeter.
+              // The ping travels out and back, so to find the distance of the object we
+              // take half of the distance travelled.
+              return microseconds / 29 / 2;
+            }
+            
+            /*
+              LCD circuit:
+             * LCD RS pin to digital pin 12
+             * LCD Enable pin to digital pin 11
+             * LCD D4 pin to digital pin 5
+             * LCD D5 pin to digital pin 4
+             * LCD D6 pin to digital pin 3
+             * LCD D7 pin to digital pin 2
+             * LCD R/W pin to ground
+             * LCD VSS pin to ground
+             * LCD VCC pin to 5V
+             * 10K resistor:
+             * ends to +5V and ground
+             * wiper to LCD VO pin (pin 3)
+            
+              Speed of sound: https://www.engineeringtoolbox.com/air-speed-sound-d_603.html#gsc.tab=0
+            */
+          </code>
+        </pre>
+      </div>
+  </div>
+</div>
+
+<div>
+  <h2>Homework Questions</h2>
+  <div class="container">
+      <div class="box">
+        <p>
+          <b>
+            1: In your voltage divider, can the variable 
+            resistor be either R1 or R2 or does it need to 
+            be one or the other? Justify your answer with 
+            example calculations.
+          </b>
+          <br>
+          <br>
+            No, the variable resistor should come first in 
+            the sequence. Though I think it may be 
+            possible to write firmware to account for the 
+            difference in output because it appears to behave
+            predictably.
+        </p>
+        <img src="Images/A3 Q1.png" />
+        <p>
+          <b>
+            2: Draw a graph where the x-axis is time and 
+            the y-axis is voltage. Plot the voltage at 
+            V-measure of your voltage divider of your 
+            shared gif.
+          </b>
+        </p>
+        <img src="Images/A3 Q2.png" />
+        <p> 
+          <b>
+            3: AnalogWrite and analogRead are 
+            respectively 8-bit and 10-bit values. 
+            Imagine you had 10-bit PWM and a 16-bit 
+            analog-to-digital converter instead. How would 
+            this change your map() code? Explain your answer.
+          </b>
+          <br>
+          <br>
+        </p>
+        <p>
+          With 8-bit holding a max value of 255 and 10-bit 1023,
+          my map function would look like this:
+          <br>
+          <br>
+        </p>
+        <pre>
+          <code class="language-arduino">
+          int sensorValue = analogRead(A0);
+          int outputValue = map(sensorValue, 0, 1023, 0, 255);
+          analogWrite(9, outputValue);
+        </code>
+        </pre>
+        <p>
+          <br>
+          Since <code>Max Value = 2n − 1</code> , changing to 10 and 16-bit 
+          would look like this:
+          <br>
+          <br>
+        </p>
+        <pre>
+        <code class="language-arduino">
+          int sensorValue = analogRead(A0);
+          int outputValue = map(sensorValue, 0, 65535, 0, 1023);
+          analogWrite(9, outputValue / 4);
+        </code>
+        </pre>
+        <p>
+          <br>
+          The output value is divided by 4, (2^2), to reduce 
+          outputValue back to 8-bit.
+          <br>
+          <br>
+        </p>
+      </div>
+    </div>
+</div>
+
+<div>
+  <h2>Bonus Work</h2>
+  <div class="container">
+      <div class="box">
+        <p>
+          This is to meet the remaining requirements for the 
+          assignment that didn't fit into my personal goals this week.
+          <br>
+          <br>
+        </p>
+        <img src="Images/A3 Result2.gif" />
+        <p>
+          At the start of the gif, I'm calibrating the photoResistor,
+          then showing that it turns the LED off when less light is
+          on the resistor.
+          <br>
+          <br>
+          <h2>Code Snippet</h2>
+        </p>
+        <pre>
+          <code class="language-arduino">
+            const int sensorPin = A0;  // pin that the sensor is attached to
+const int ledPin = 9;      // pin that the LED is attached to
+
+int sensorValue = 0;   // the sensor value
+int sensorMin = 1023;  // minimum sensor value
+int sensorMax = 0;     // maximum sensor value
+
+void setup() {
+  // turn on LED to signal the start of the calibration period:
+  pinMode(13, OUTPUT);
+  digitalWrite(13, HIGH);
+
+  // calibrate during the first five seconds
+  while (millis() < 5000) {
+    sensorValue = analogRead(sensorPin);
+
+    // record the maximum sensor value
+    if (sensorValue > sensorMax) {
+      sensorMax = sensorValue;
+    }
+
+    // record the minimum sensor value
+    if (sensorValue < sensorMin) {
+      sensorMin = sensorValue;
+    }
+  }
+
+  // signal the end of the calibration period
+  digitalWrite(13, LOW);
+}
+
+void loop() {
+  // read the sensor:
+  sensorValue = analogRead(sensorPin);
+
+  // in case the sensor value is outside the range seen during calibration
+  sensorValue = constrain(sensorValue, sensorMin, sensorMax);
+
+  // apply the calibration to the sensor reading
+  sensorValue = map(sensorValue, sensorMin, sensorMax, 0, 255);
+
+  // fade the LED using the calibrated value:
+  analogWrite(ledPin, sensorValue);
+}
+          </code>
+        </pre>

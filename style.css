@@ -66,6 +66,13 @@ h2 {
   margin-top: 2em;
 }
 
+.split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 1em;
+  margin-top: 2em;
+}
+
 .assignment a {
   color: #000;
   text-decoration: none;
