@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0" />
+    <link rel="stylesheet" href="prism.css">
+    <script defer src="prism.js"></script>
+    
+    <title>Fianl Project</title>
+
+    <link href="style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <h1>Using Hand Gestures as A Design Tool For UIs!</h1>
+    <div class="header">
+      <img src="Images/red-panda.jpg" />
+      <p>Here is all the documentation for my final project.
+        <br>
+        <br>
+        [paragraph]
+      </p>
+    </div>
+  </body>
+</html>
+
+<div class="grid">
+  <div class="element">
+    <h2>Project Proposal</h2>
+    <img src="Images/FinalProposalComplete.png" />
+  </div>
+
+<!-- <div class="grid">
+  <div class="element">
+    <h2>Circuit Design</h2>
+    <img src="Images/A6 Circuit.png" />
+  </div>
+
+  <div class="element">
+      <h2>Schematic</h2>
+      <img src="Images/A6 Schematic.png" />
+  </div>
+</div>
+
+<div> 
+  <h2>Java Code Snippet</h2>
+  <div class="container">
+      <div class="box">
+        <pre> 
+          <code class="language-javascript">
+            code snippet
+          </code>
+        </pre>
+      </div>
+  </div>
+</div>
+
+<div> 
+  <h2>Arduino Code Snippet</h2>
+  <div class="container">
+      <div class="box">
+        <pre> 
+          <code class="language-arduino">
+            const int light = A0;   // Pin for photoresistor
+            const int potG = A1;    // Pin for green potentiometer
+            const int potB = A2;    // Pin for blue potentiometer
+            const int red = 9;      // red led
+            const int green = 10;   // green led
+            const int blue = 11;    // blue led
+            
+            // storage values for mapping input to desired output values
+            int lightVal, tempVal, potVal;
+            
+            void setup()
+            {
+              Serial.begin(9600);
+            }
+            
+            void loop()
+            {
+              // map input to desired output values
+              lightVal = map(analogRead(light), 600, 790, 0, 255);  // input values should be changed for different environments
+              tempVal = map(analogRead(potG), 0, 1021, 0, 255);
+              potVal = map(analogRead(potB), 0, 1021, 0, 255);
+            
+              // communicate measurement values over the serial port
+              Serial.print(lightVal);
+              Serial.print(",");
+              Serial.print(tempVal);
+              Serial.print(",");
+              Serial.println(potVal);
+            
+              // looks for input from the web app
+              if(Serial.available() > 0){
+                analogWrite(red, lightVal);   // turn red led on to set value
+                analogWrite(green, tempVal);  // turn green led on to set value
+                analogWrite(blue, potVal);    // turn blue led on to set value
+              }
+            
+              delay(50);  // arbitrary delay
+            }
+          </code>
+        </pre>
+      </div>
+  </div> -->
+</div> 
