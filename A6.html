@@ -6,21 +6,16 @@
     <link rel="stylesheet" href="prism.css">
     <script defer src="prism.js"></script>
     
-    <title>A6: Talking to the web!</title>
+    <title>A2: Fading Lights</title>
 
     <link href="style.css" rel="stylesheet" type="text/css" />
   </head>
   <body>
-    <h1>A6: Talking to the web!</h1>
+    <h1>A2: Fading Lights</h1>
     <div class="header">
-      <img src="Images/A6 Result.gif" />
-      <img src="Images/A6 Result 2.png" />
-      <p>Here is all the documentation for A6: Talking to the web!
-        <br>
-        <br>
-        I built a circuit that uses light to determine the intesity of red light with potentiometers
-        for blue and green on the very simple web app. A button on the web app allows for the 
-        combination of the lights to be reproduced by an LED in the circuit.
+      <img src="Images/red-panda.jpg" />
+      <p>Here is all the documentation for A2: Fade!
+        This was the result.
       </p>
     </div>
   </body>
@@ -29,188 +24,79 @@
 <div class="grid">
   <div class="element">
     <h2>Circuit Design</h2>
-    <img src="Images/A6 Circuit.png" />
+    <img src="Images/red-panda.jpg" />
+    <p>
+      Description
+    </p>
   </div>
 
   <div class="element">
       <h2>Schematic</h2>
-      <img src="Images/A6 Schematic.png" />
+      <img src="Images/red-panda.jpg" />
+      <p>
+        Description
+      </p>
   </div>
 </div>
 
 <div> 
-  <h2>Java Code Snippet</h2>
-  <div class="container">
-      <div class="box">
-        <pre> 
-          <code class="language-javascript">
-            // This code is mostly Hannah Twigg-Smith's from HCDE 439 examples
-
-            const BAUD_RATE = 9600; // This should match the baud rate in your Arduino sketch
-            let port, connectBtn, circleDiameter, setLEDBtn; // Declare global variables
-            
-            function setup() {
-              setupSerial(); // Run our serial setup function (below)
-            
-              // Create a canvas that is the size of our browser window.
-              // windowWidth and windowHeight are p5 variables
-              createCanvas(windowWidth, windowHeight);
-            
-              // Set our circle diameter based on the window dimensions
-              circleDiameter = min(windowWidth, windowHeight) * 0.5;
-            
-              // p5 text settings. BOLD and CENTER are constants provided by p5.
-              // See the "Typography" section in the p5 reference: https://p5js.org/reference/
-              textFont("system-ui", 50);
-              textStyle(BOLD);
-              textAlign(CENTER, CENTER);
-            
-              // Set the canvas blend mode. see https://p5js.org/reference/#/p5/blendMode
-              blendMode(ADD);
-            
-              // Make a button to change LED to match values
-              setLEDBtn = createButton("Sync LED"); // Create the button and assign text to it
-              setLEDBtn.position(5, 30); // Position the button in the top left of the screen below arduino button.
-              setLEDBtn.mouseClicked(onLEDButtonClicked); // When the button is clicked, run the onLEDButtonClicked function
-            }
-            
-            function draw() {
-              const portIsOpen = checkPort(); // Check whether the port is open (see checkPort function below)
-              if (!portIsOpen) return; // If the port is not open, exit the draw loop
-            
-              let str = port.readUntil("\n"); // Read from the port until the newline
-              if (str.length == 0) return; // If we didn't read anything, return.
-            
-              let rgbArray = str.trim().split(","); // Trim whitespace and split on commas
-            
-              //  Round to nearest integer for input values
-              const red = round(rgbArray[0]);
-              const green = round(rgbArray[1]);
-              const blue = round(rgbArray[2]);
-            
-              clear(); // Clear the canvas
-              background(0); // Make the background black
-              translate(windowWidth / 2, windowHeight / 2); // Move the origin to the center
-            
-              // Text on top
-              fill(255);
-              stroke(0);
-              strokeWeight(4);
-              text(`${red}, ${green}, ${blue}`, 0, -circleDiameter * 0.75);
-            
-              // Red circle
-              fill(red, 0, 0);
-              circle(0, circleDiameter / 4, circleDiameter);
-            
-              // Green circle
-              rotate((2 * PI) / 3);
-              fill(0, green, 0);
-              circle(0, circleDiameter / 4, circleDiameter);
-            
-              // Blue circle
-              rotate((2 * PI) / 3);
-              fill(0, 0, blue);
-              circle(0, circleDiameter / 4, circleDiameter);
-            }
-            
-            // Three helper functions for managing the serial connection.
-            function setupSerial() {
-              port = createSerial();
-            
-              // Check to see if there are any ports we have used previously
-              let usedPorts = usedSerialPorts();
-              if (usedPorts.length > 0) {
-                // If there are ports we've used, open the first one
-                port.open(usedPorts[0], BAUD_RATE);
-              }
-            
-              // create a connect button
-              connectBtn = createButton("Connect to Arduino");
-              connectBtn.position(5, 5); // Position the button in the top left of the screen.
-              connectBtn.mouseClicked(onConnectButtonClicked); // When the button is clicked, run the onConnectButtonClicked function
-            }
-            
-            function checkPort() {
-              if (!port.opened()) {
-                // If the port is not open, change button text
-                connectBtn.html("Connect to Arduino");
-                // Set background to gray
-                background("gray");
-                return false;
-              } else {
-                // Otherwise we are connected
-                connectBtn.html("Disconnect");
-                return true;
-              }
-            }
-            
-            function onConnectButtonClicked() {
-              // When the connect button is clicked
-              if (!port.opened()) {
-                // If the port is not opened, we open it
-                port.open(BAUD_RATE);
-              } else {
-                // Otherwise, we close it!
-                port.close();
-              }
-            }
-            
-            // when "Sync LED" is clicked, send a signal to the ardino to turn the LED on
-            function onLEDButtonClicked() {
-              port.write(1);
-            }
-          </code>
-        </pre>
-      </div>
-  </div>
-</div>
-
-<div> 
-  <h2>Arduino Code Snippet</h2>
+  <h2>Code Snippet</h2>
   <div class="container">
       <div class="box">
         <pre> 
           <code class="language-arduino">
-            const int light = A0;   // Pin for photoresistor
-            const int potG = A1;    // Pin for green potentiometer
-            const int potB = A2;    // Pin for blue potentiometer
-            const int red = 9;      // red led
-            const int green = 10;   // green led
-            const int blue = 11;    // blue led
-            
-            // storage values for mapping input to desired output values
-            int lightVal, tempVal, potVal;
-            
-            void setup()
-            {
-              Serial.begin(9600);
-            }
-            
-            void loop()
-            {
-              // map input to desired output values
-              lightVal = map(analogRead(light), 600, 790, 0, 255);  // input values should be changed for different environments
-              tempVal = map(analogRead(potG), 0, 1021, 0, 255);
-              potVal = map(analogRead(potB), 0, 1021, 0, 255);
-            
-              // communicate measurement values over the serial port
-              Serial.print(lightVal);
-              Serial.print(",");
-              Serial.print(tempVal);
-              Serial.print(",");
-              Serial.println(potVal);
-            
-              // looks for input from the web app
-              if(Serial.available() > 0){
-                analogWrite(red, lightVal);   // turn red led on to set value
-                analogWrite(green, tempVal);  // turn green led on to set value
-                analogWrite(blue, potVal);    // turn blue led on to set value
-              }
-            
-              delay(50);  // arbitrary delay
-            }
+          Code Snippet
           </code>
         </pre>
       </div>
   </div>
+</div>
+
+<div>
+  <h2>Homework Questions</h2>
+  <div class="container">
+      <div class="box">
+        <p>
+          <b>
+            1: Draw a graph where the X axis is time and 
+            the Y axis is voltage across the LEDs. Draw a 
+            line for each of your 3 LEDs.
+          </b>
+        </p>
+        <img src="Images/red-panda.jpg"/>
+        <p>
+          <b>
+            2: How many LEDs could you blink at once with 
+            your Arduino? How much current would that draw?
+          </b>
+        </p>
+        <p>
+          I think the 5v limitations of the Arduino is the 
+          limiting factor. Therefore, I could chain two red,
+          green, or yellow LEDs with a 220Ω resistor for 
+          a current draw of 0.006A
+          OR a single blue, pink, or white LED with a 100Ω 
+          resistor for a current draw of 0.017A.
+        </p>
+        <p> 
+          <b>
+            <s>
+              3: How many LEDs could you blink with your 
+              Arduino if only one were to be on at once?
+            </s>
+          </b>
+        </p>
+        <p>
+          <b>
+            4: How fast do you need to blink your LEDs until you no longer can tell that they are blinking?
+          </b>
+        </p>
+        <p>
+          Even blinking it for 1 milisecond with a second between
+          blinks, the blink was visible. If the blink and pause 
+          between blinks is 1 milisecond, then the LED simply 
+          appears to remain on.
+        </p>
+      </div>
+    </div>
 </div>
