@@ -14,10 +14,8 @@
     <h1>Using Hand Gestures as A Design Tool For UIs!</h1>
     <div class="header">
       <img src="Images/red-panda.jpg" />
-      <p>Here is all the documentation for my final project.
-        <br>
-        <br>
-        [paragraph]
+      <p>My goal was to create a device that didn't feel like technology but interfaced with my calendar
+        , weather
       </p>
     </div>
   </body>
@@ -29,7 +27,7 @@
     <img src="Images/FinalProposalComplete.png" />
   </div>
 
-<!-- <div class="grid">
+<div class="grid">
   <div class="element">
     <h2>Circuit Design</h2>
     <img src="Images/A6 Circuit.png" />
@@ -42,64 +40,329 @@
 </div>
 
 <div> 
-  <h2>Java Code Snippet</h2>
-  <div class="container">
-      <div class="box">
-        <pre> 
-          <code class="language-javascript">
-            code snippet
-          </code>
-        </pre>
-      </div>
-  </div>
-</div>
-
-<div> 
   <h2>Arduino Code Snippet</h2>
   <div class="container">
       <div class="box">
         <pre> 
           <code class="language-arduino">
-            const int light = A0;   // Pin for photoresistor
-            const int potG = A1;    // Pin for green potentiometer
-            const int potB = A2;    // Pin for blue potentiometer
-            const int red = 9;      // red led
-            const int green = 10;   // green led
-            const int blue = 11;    // blue led
-            
-            // storage values for mapping input to desired output values
-            int lightVal, tempVal, potVal;
-            
-            void setup()
-            {
-              Serial.begin(9600);
-            }
-            
-            void loop()
-            {
-              // map input to desired output values
-              lightVal = map(analogRead(light), 600, 790, 0, 255);  // input values should be changed for different environments
-              tempVal = map(analogRead(potG), 0, 1021, 0, 255);
-              potVal = map(analogRead(potB), 0, 1021, 0, 255);
-            
-              // communicate measurement values over the serial port
-              Serial.print(lightVal);
-              Serial.print(",");
-              Serial.print(tempVal);
-              Serial.print(",");
-              Serial.println(potVal);
-            
-              // looks for input from the web app
-              if(Serial.available() > 0){
-                analogWrite(red, lightVal);   // turn red led on to set value
-                analogWrite(green, tempVal);  // turn green led on to set value
-                analogWrite(blue, potVal);    // turn blue led on to set value
+            /***************************************************
+              Adafruit invests time and resources providing this open source code,
+              please support Adafruit and open-source hardware by purchasing
+              products from Adafruit!
+
+              Written by Limor Fried/Ladyada for Adafruit Industries.
+              MIT license, all text above must be included in any redistribution
+            ****************************************************/
+
+            #include "Adafruit_ThinkInk.h"
+
+            #ifdef ARDUINO_ADAFRUIT_FEATHER_RP2040_THINKINK // detects if compiling for
+                                                            // Feather RP2040 ThinkInk
+            #define EPD_DC PIN_EPD_DC       // ThinkInk 24-pin connector DC
+            #define EPD_CS PIN_EPD_CS       // ThinkInk 24-pin connector CS
+            #define EPD_BUSY PIN_EPD_BUSY   // ThinkInk 24-pin connector Busy
+            #define SRAM_CS -1              // use onboard RAM
+            #define EPD_RESET PIN_EPD_RESET // ThinkInk 24-pin connector Reset
+            #define EPD_SPI &SPI1           // secondary SPI for ThinkInk
+            #else
+            #define EPD_DC 10
+            #define EPD_CS 9
+            #define EPD_BUSY 7 // can set to -1 to not use a pin (will wait a fixed delay)
+            #define SRAM_CS 6
+            #define EPD_RESET 8  // can set to -1 and share with microcontroller Reset!
+            #define EPD_SPI &SPI // primary SPI
+            #endif
+
+            // 2.13" Tricolor EPD with SSD1680 chipset
+            ThinkInk_213_Tricolor_RW display(EPD_DC, EPD_RESET, EPD_CS, SRAM_CS, EPD_BUSY, EPD_SPI);
+
+            // calendar dot matrix values
+            const int spread = 16; // calendar dot matrix spacing
+            const int leftBound = 21; // starting pixel for left dots
+
+            // screen coordinates
+            int screenX = 0;
+            int screenY = 0;
+
+
+            /***************************************************************************
+              This is a library for the APDS9960 digital proximity, ambient light, RGB, and gesture sensor
+
+              This sketch puts the sensor in gesture mode and decodes gestures.
+              To use this, first put your hand close to the sensor to enable gesture mode.
+              Then move your hand about 6" from the sensor in the up -> down, down -> up, 
+              left -> right, or right -> left direction.
+
+              Designed specifically to work with the Adafruit APDS9960 breakout
+              ----> http://www.adafruit.com/products/3595
+
+              These sensors use I2C to communicate. The device's I2C address is 0x39
+
+              Adafruit invests time and resources providing this open source code,
+              please support Adafruit andopen-source hardware by purchasing products
+              from Adafruit!
+
+              Written by Dean Miller for Adafruit Industries.
+              BSD license, all text above must be included in any redistribution
+            ***************************************************************************/
+
+            #include "Adafruit_APDS9960.h"
+            Adafruit_APDS9960 apds;
+
+            void setup() {
+              Serial.begin(115200);
+              
+
+            // EPD init
+              Serial.println("Adafruit EPD full update test in red/black/white");
+              display.begin(THINKINK_TRICOLOR);
+
+
+            // Gesture sensor init
+              if(!apds.begin()){
+                Serial.println("failed to initialize device! Please check your wiring.");
               }
-            
-              delay(50);  // arbitrary delay
+              else Serial.println("Device initialized!");
+
+              // Gesture mode will be entered once proximity mode senses something close
+              apds.enableProximity(true);
+              apds.enableGesture(true);
+
+            // Diplay home page (0,0)
+              monthCalendar();
             }
+
+            void loop() {
+            // Read a gesture from the device and interpret user input
+              uint8_t gesture = 0;  // default value
+              gesture = apds.readGesture();  // assigns gesture value
+              Serial.println(gesture);
+
+              // Based on the detected gesture, change the page coordinates.
+                // Decrease screenY if downward motion detected
+              if(gesture == APDS9960_DOWN) {
+                Serial.println("v");  
+                screenY-=1;
+              }
+                // Increase screenY if upward motion detected
+              if(gesture == APDS9960_UP) {
+                Serial.println("^");
+                screenY+=1;
+              }
+                // Decrease screenX if leftward motion detected
+              if(gesture == APDS9960_LEFT) {
+                Serial.println("<");
+                screenX-=1;
+              }
+                // Increase screenX if rightward motion detected
+              if(gesture == APDS9960_RIGHT) {
+                Serial.println(">");
+                screenX+=1;
+              }
+              // This sensor can detect moving closer and moving farther.
+                // This could introduce a z-axis and/or zooming features.
+
+              // Keep the user from scrolling too far.
+                // Temporary solution till scrolling implimented.
+              constrain(screenX, 0, 1);  
+              constrain(screenY, 0, 1);
+
+              // Display user selected screen
+              if (gesture != 0){  // if a gesture was detectd...
+                if (screenX==0 && screenY==0){ 
+                  monthCalendar();
+                }
+                if (screenX==1 && screenY==0){
+                  dayCalendar();
+                }
+                if (screenX==0 && screenY==1){
+                  weather();
+                }
+              }
+              // Needs to account for overflowing. i.e. scrolling beyond mapped screens.
+                // Loop the scroll to be continuous.
+              // Also needs a way to listen to the sensor while the screen is being generated
+                // so the user can interrupt to continue moving or go back without having to wait.
+            }
+
+            void monthCalendar(){
+              Serial.print("Frame (0,0): Month Matrix | Day Calendar");
+              int x = 85;
+              int y = 26;
+              display.clearBuffer();
+              display.setTextSize(1);
+              display.setTextColor(EPD_RED);
+              display.setCursor(19, 24);
+              display.print("FEBRUARY");
+              display.setTextSize(2);
+              display.setCursor(155, 83);
+              display.print("Monday");
+              display.setTextSize(6);
+              display.setCursor(158, 34);
+              display.print("26");
+              display.drawRect(151, 25, 80, 80, EPD_BLACK);
+              display.fillRect(151, 17, 80, 8, EPD_BLACK);
+              // for (y; y < 118; y+=8){
+              //   for (x; x < 91; x+=8){
+              //     
+              //     Serial.println(x);
+              //     Serial.println(y);
+              //   }
+              // }
+
+              // Draw month calendar dot matrix
+              // Row 1
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+
+              // Row 2
+              y+=spread;
+              x=leftBound;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+
+              // Row 3
+              y+=spread;
+              x=leftBound;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+
+              // Row 4
+              y+=spread;
+              x=leftBound;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+
+              // Row 5
+              y+=spread;
+              x=leftBound;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.fillCircle(x, y, 4, EPD_RED);
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+              x+=spread;
+              display.drawCircle(x, y, 4, EPD_BLACK);
+
+              display.display();
+            }
+            void dayCalendar(){
+              Serial.print("Frame (1,0): Day Calendar");
+              display.clearBuffer();
+              // Day + date
+              display.setTextSize(4);
+              display.setTextColor(EPD_BLACK);
+              display.setCursor(22, 22);
+              display.print("Monday");
+
+              display.setTextColor(EPD_RED);
+              display.setCursor(180, 22);
+              display.print("26");
+              // Events
+              //   // Bullets
+              // display.drawCircle(22, 58, 4, EPD_BLACK);
+              // display.drawCircle(22, 74, 4, EPD_BLACK);
+              // display.drawCircle(22, 90, 4, EPD_BLACK);
+                // Times
+              display.setTextSize(2);
+              display.setCursor(22, 55);
+              display.print("9:00");
+              
+              display.setCursor(22, 71);
+              display.print("11:30");
+
+              display.setCursor(22, 87);
+              display.print("1:00");
+                // Event titles
+              display.setTextColor(EPD_BLACK);
+              display.setCursor(87, 55);
+              display.print("Design Time");
+              
+              display.setCursor(87, 71);
+              display.print("Lunch w/ Leo");
+
+              display.setCursor(87, 87);
+              display.print("439 Homework");
+
+              display.display();
+            }
+            void weather(){
+              Serial.print("Frame (0,1): Weather Icon | Temp & Rain");
+              display.clearBuffer();
+              // Temperature
+              display.setTextSize(6);
+              display.setTextColor(EPD_RED);
+              display.setCursor(125, 31);
+              display.print("12");
+
+              display.setTextSize(4);
+              display.setCursor(208, 31);
+              display.print("C");
+              display.drawCircle(199, 31, 4, EPD_RED);
+              // Rain forecast
+              display.setTextSize(2);
+              display.setTextColor(EPD_BLACK);
+              display.setCursor(120, 81);
+              display.print("Rain @ 2pm");
+              // Cloud
+                // outlines
+              display.drawCircle(54, 43, 23, EPD_BLACK);
+              display.drawCircle(76, 63, 25, EPD_BLACK);
+              display.drawCircle(52, 67, 22, EPD_BLACK);
+              display.drawCircle(31, 67, 22, EPD_BLACK);
+                // fills
+              display.fillCircle(67, 65, 21, EPD_WHITE); 
+              display.fillCircle(31, 67, 21, EPD_WHITE);
+              display.fillCircle(53, 43, 21, EPD_WHITE);
+              display.fillCircle(76, 63, 23, EPD_WHITE); 
+
+              display.display();
+            }
+            // Aditional frames to build:
+              // dayCalendar+-: Moving through multiple days on the dayCalendar
+              // forecast: A 5-day forecast
+              // home: A simple home page with navigation signs to other pages
           </code>
         </pre>
       </div>
-  </div> -->
+  </div>
 </div> 
