@@ -13,32 +13,124 @@
   <body>
     <h1>Using Hand Gestures as A Design Tool For UIs!</h1>
     <div class="header">
-      <img src="Images/red-panda.jpg" />
-      <p>My goal was to create a device that didn't feel like technology but interfaced with my calendar
-        , weather
+      <iframe width="1200" height="300" src="https://www.youtube.com/embed/JAvqPmuExi4?si=vuGP21-sL15c91Gi" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      <p>My goal was to create a device that didn't feel like technology but interfaced with my calendar and 
+        weather apps so that I wouldn't have to go to my phone for that information.
       </p>
     </div>
   </body>
 </html>
 
-<div class="grid">
+<div>
+  <br>
+  <br>
   <div class="element">
     <h2>Project Proposal</h2>
     <img src="Images/FinalProposalComplete.png" />
+    <p>
+      This was how I envisioned my project going after deciding on which components I would be using.
+      <br>
+      <br>
+      After experimenting with several e-Paper displays, I ended up using componenets from Adafruit 
+      due to the thorough documentation on their site as a first attempt at this type of interface. 
+      I used this <a href="https://www.adafruit.com/product/3595"> gesture sensor</a>
+      as my input device and this <a href="https://www.adafruit.com/product/4947"> e-Paper display</a>.
+    </p>
+    <div class="grid">
+      <div class="element">
+        <a href="https://www.adafruit.com/product/3595">
+          <img src="Images/Gesture Sensor.jpg" />
+        </a>
+      </div>
+      <div class="element">
+        <a href="https://www.adafruit.com/product/4947">
+          <img src="Images/EPD.jpg" />
+        </a>
+      </div>
+    </div>
   </div>
+
+  <div>
+    <br>
+    <br>
+    <div class="element">
+      <h2>Implementation</h2>
+      <p>
+        <b>
+          Screen Design:
+        </b>
+        I started by learning the graphic library recommended for this e-Paper display (EPD) so that I knew what
+        my design limitations would be. These were the screens I designed.
+        <br>
+        <img src="Images/FrameDesigns.jpg" />
+        <br>
+        And this is what they actually ended up looking like.
+        <br>
+        <img src="Images/FrameActuals.jpg" />
+        <br>
+
+        <b>
+          Firmware Design:
+        </b>
+        Knowing that gestures would be initially be limited by up, down, right, and left, a coordinate
+        system made the most sense to me for navigating the screens. For example, the home screen would be located
+        at (0,0) and when a swipe right is registered, the screen (1,0) would be called.
+        <br>
+        <img src="Images/CoordinateSystem.jpg" />
+        <br>
+        Something I wasn't able to get to in time was adding a z-axis. Since the sensor can detect close-to-far
+        and far-to-close gestures, zooming in from a month calendar to a day view may prove more intuitive.
+
+        <br>
+        <br>
+        <b>
+          Hardware Design:
+        </b>
+        Starting on a breadboard, I struggled to get the EPD to reliably display what it was supposed to. I kept
+        getting a drifting effect. After lots of documentation reading and trying different solutions, I found
+        that the problem was an error in Adafruit's documentation or a hardware flaw for my screen that 
+        required the 3v from the Arduino to go through the 3v3 pin rather than vin.
+        <br>
+        <br>
+        <img src="Images/Breadboard.JPG" />
+        <br>
+        Next, I lasercut a box to house my components.
+        <br>
+        <br>
+        <img src="Images/LaserCutting.gif" />
+        <br>
+        I ran into another problem when moving my components onto a smaller breadboard. I still don't understand
+        why, but the EPD wouldn't work on that board. I ended up solderinng a simple power supply wire harness
+        to get around this problem.
+        <div class="grid">
+          <div class="element">
+              <img src="Images/Prototype1.JPG" />
+          </div>
+          <div class="element">
+              <img src="Images/Prototype2.JPG" />
+          </div>
+          <div class="element">
+            <img src="Images/Prototype3.JPG" />
+        </div>
+      </p>
+    </div>
+  </div>
+
 
 <div class="grid">
   <div class="element">
     <h2>Circuit Design</h2>
-    <img src="Images/A6 Circuit.png" />
+    <img src="Images/FinalCircuit.jpeg" />
   </div>
 
   <div class="element">
-      <h2>Schematic</h2>
-      <img src="Images/A6 Schematic.png" />
+    <h2>Schematic</h2>
+    <p>*3.7v</p>
+    <img src="Images/FinalSchematic.jpeg" />
   </div>
 </div>
-
+<br>
+<br>
 <div> 
   <h2>Arduino Code Snippet</h2>
   <div class="container">
@@ -209,6 +301,7 @@
               //     Serial.println(y);
               //   }
               // }
+              // I'm uncertain why this loop won't work, so I did it the long way
 
               // Draw month calendar dot matrix
               // Row 1
