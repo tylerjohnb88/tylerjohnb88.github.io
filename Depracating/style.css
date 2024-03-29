@@ -37,6 +37,13 @@ h2 {
   font-weight: 700;
 }
 
+h3 {
+  background-color: #333;
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+}
+
 .header {
   display: flex;
   gap: 1em;
@@ -71,4 +78,14 @@ h2 {
 
 .assignment p {
   margin-top: 0.5em;
+}
+
+.btn {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin: 0 10px;
 }
